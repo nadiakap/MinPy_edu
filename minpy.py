@@ -119,6 +119,9 @@ class Minimization(object):
     def stop(self):
         return (sum((self.fu-self.c)**2  ))**0.5 < self.tol
     
+    def adjust_step(self):
+        pass
+    
     def minimize_NMExt(self):
         self.initialize()
         self.compute_fu()
