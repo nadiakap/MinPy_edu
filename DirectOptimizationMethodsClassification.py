@@ -3,7 +3,7 @@
 # Fixing random state for reproducibility
 np.random.seed(19680801)
 
-method_list=['Cyclic Coordinate Descend','Powell','Hooke Jeeves','Nelder Mead']
+method_list=['Cyclic Coordinate Descent','Powell','Hooke Jeeves','Nelder Mead']
 import numpy as np
 import matplotlib.pyplot as pp
 val = 0. # this is the value where you want the data to appear on the y-axis.
