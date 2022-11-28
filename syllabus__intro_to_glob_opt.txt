@@ -1,0 +1,29 @@
+
+Objective:
+
+this course will introduce students to currently existing optimization strategies and their software implementations, and build intuitive understanding of their similarities and differences, to be able to design new optimization strategies with desired properties.
+Use cases from behavioral economics, Robotics, design of experiments and machne learning will be discussed.
+
+Course Mode:
+Video records as introductions to each topic(5 lectures, 10 min each)
+Suggested Projects ( video records are available for project explanation)
+
+Tools: Python, ScipPy, Tensorflow, MinPy_edu
+
+1. deriving global opt methods from potential theory:introduction to the approach, basic concepts.
+	problem setup
+	existing approaches
+	taxonomy of optimization methods
+		reinforcement learning
+		supervised leaning
+		unsupervised leaning
+		methods used in case of expensive function evaluations
+		evolutionary optimization
+	what's new in our approach
+	derivation
+
+2. use cases:optimization strategies in real life.
+	investment strategies, with ideas from behavioral economics
+	learning strategies (learning to read, learning math, etc, for different types people)
+        strategies for designing experiments
+	
