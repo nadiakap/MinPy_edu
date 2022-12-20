@@ -1,3 +1,6 @@
+"""
+test functions for optimization
+"""
 import numpy as np
 def spher(x):
     '''
