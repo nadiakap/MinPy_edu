@@ -1,5 +1,5 @@
 """
-test functions for optimization
+Test Functions For Optimization
 """
 import numpy as np
 def spher(x):
