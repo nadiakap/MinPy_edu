@@ -21,6 +21,6 @@ Prerequisites:
  
 Running instructions:
 
-1. Clone minpy_udu repo
-2. Install Jupiter notebook
+1. Clone minpy_edu repo
+2. Install Jupyter notebook
 
