@@ -14,3 +14,13 @@ Currently minpy library consists of two python files, minpy.py ( building blocks
 
 supporting paper from scipy 2022 conference: https://doi.org/10.25080/majora-212e5952-019
 supporting poster from Scipy 2022 conference is in this repository
+
+Prerequisites:
+
+1. Python 3.6+/Anaconda or Python Scipy, Numpy, Matplotlib, Jupiter notebook
+ 
+Running instructions:
+
+1. Clone minpy_udu repo
+2. Install Jupiter notebook
+
