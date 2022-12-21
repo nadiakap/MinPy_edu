@@ -17,7 +17,8 @@ supporting poster from Scipy 2022 conference is in this repository
 
 Prerequisites:
 
-1. Python 3.6+/Anaconda or Python Scipy, Numpy, Matplotlib, Jupiter notebook
+1. Python 3.6+
+2. Scipy, Numpy, Pandas, Matplotlib, Jupiter notebook ( or Anaconda - all required packages are part of Anaconda)
  
 Running instructions:
 
