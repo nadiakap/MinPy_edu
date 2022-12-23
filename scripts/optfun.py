@@ -3,6 +3,7 @@ Test Functions For Optimization
 """
 import numpy as np
 
+#plotting a function
 def plot_fnc(fnc):
     from mpl_toolkits.mplot3d import Axes3D
     from matplotlib import cm
