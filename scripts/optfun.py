@@ -2,6 +2,32 @@
 Test Functions For Optimization
 """
 import numpy as np
+
+def plot_fnc(fnc):
+    from mpl_toolkits.mplot3d import Axes3D
+    from matplotlib import cm
+    from matplotlib.ticker import LinearLocator, FormatStrFormatter
+    import matplotlib.pyplot as plot
+    import numpy as np
+    #%matplotlib inline 
+    fig = plot.figure()
+    ax = fig.gca(projection='3d')
+    s = 0.05 # Try s=1, 0.25, 0.1, or 0.05
+    X = np.arange(-2, 2.+s, s) #Could use linspace instead if dividing
+    Y = np.arange(-2, 3.+s, s) #evenly instead of stepping... 
+    #Create the mesh grid(s) for all X/Y combos.
+    X, Y = np.meshgrid(X, Y)
+    #Z =  X**2 + Y**2
+    
+    xx = np.stack((X,Y))
+    Z =  fnc(xx)
+    surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm,
+     linewidth=0, antialiased=False) #Try coolwarm vs jet
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+    plot.show()
+    
 def spher(x):
     '''
     smooth function of n variables, minimum = 0.0, achieved at (,0,..,0)
@@ -9,7 +35,7 @@ def spher(x):
     sm = 0
     for i in range(x.shape[0]):
         sm+=x[i]**2
-    return sm**0.5  
+    return sm  
 
 def booth(x): 
     '''
@@ -157,5 +183,8 @@ if __name__== "__main__":
     print('shor10_value = ',y)
     x = UTPM.init_jacobian(arg)
     y = shor10(x)
-    algopy_jacobian = UTPM.extract_jacobian(y)    
+    algopy_jacobian = UTPM.extract_jacobian(y) 
+    plot_fnc(spher)
+    plot_fnc(booth)
+    plot_fnc(ackley)
         
