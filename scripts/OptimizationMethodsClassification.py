@@ -16,7 +16,6 @@ def randrange(n, vmin, vmax):
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
-
 n = 7
 i = 1
 # For each set of style and range settings, plot n random points in the box

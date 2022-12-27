@@ -3,7 +3,7 @@ Test Functions For Optimization
 """
 import numpy as np
 
-#plotting a function
+#plotting a function of two variables, 3d picture
 def plot_fnc(fnc):
     from mpl_toolkits.mplot3d import Axes3D
     from matplotlib import cm
@@ -27,7 +27,39 @@ def plot_fnc(fnc):
     ax.zaxis.set_major_locator(LinearLocator(10))
     ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
     fig.colorbar(surf, shrink=0.5, aspect=5)
+    plot.title('function ' + fnc.__name__)
     plot.show()
+ 
+#plot a function of two variables, given bounds on each variable, 3d picture    
+def plot_fnc_rng(fnc, bounds = [[-2.,2.],[-2.,3]], s = 0.5):
+    from mpl_toolkits.mplot3d import Axes3D
+    from matplotlib import cm
+    from matplotlib.ticker import LinearLocator, FormatStrFormatter
+    import matplotlib.pyplot as plot
+    import numpy as np
+    #%matplotlib inline 
+    fig = plot.figure()
+    ax = fig.gca(projection='3d')
+    s = 0.05 # Try s=1, 0.25, 0.1, or 0.05
+    #X = np.arange(-2, 2.+s, s) #Could use linspace instead if dividing
+    #Y = np.arange(-2, 3.+s, s) #evenly instead of stepping... 
+    #Create the mesh grid(s) for all X/Y combos.
+    rng = np.array(bounds)
+    X = np.arange(rng[(0,0)], rng[(0,1)]+s, s) #Could use linspace instead if dividing
+    Y = np.arange(rng[(1,0)], rng[1,1]+s, s) #evenly instead of stepping... 
+  
+    X, Y = np.meshgrid(X, Y)
+    #Z =  X**2 + Y**2
+    
+    xx = np.stack((X,Y))
+    Z =  fnc(xx)
+    surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm,
+     linewidth=0, antialiased=False) #Try coolwarm vs jet
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+    plot.title('function ' + fnc.__name__)
+    plot.show()  
     
 def spher(x):
     '''
@@ -48,9 +80,11 @@ def booth(x):
 def easom(x):        
     '''
     function of two variables, minimum = -1, achieved at (pi,pi)
-    arg bounds = [(-100, 100), (-100, 100)]
+    arg bounds = [(-20, 20), (-20, 20)]
     '''
-    return -np.cos(x[0])*np.cos(x[1])*np.exp(-((x[0]-np.pi)**0.5+(x[1]-np.pi)**0.5))
+    tmp = np.exp(-(x[0]-np.pi)**2 - (x[1]-np.pi)**2)
+    
+    return -np.cos(x[0])*np.cos(x[1])*tmp
 
 def ackley(x):
     '''
@@ -188,4 +222,17 @@ if __name__== "__main__":
     plot_fnc(spher)
     plot_fnc(booth)
     plot_fnc(ackley)
+    plot_fnc(himmelblau)
+    plot_fnc_rng(himmelblau)
+    bounds = [[-2.,2.],[-2.,3]]
+    #bounds = np.array(tmp)
+    plot_fnc_rng(ackley,bounds)
+    plot_fnc_rng(ackley)
+
+    bounds = [[-4.,4.],[-4.,5]]
+    plot_fnc_rng(himmelblau,bounds)
+    
+    bounds = [[-20.,20.],[-20.,20]]
+    plot_fnc_rng(easom,bounds,s=2.)
+   
         
