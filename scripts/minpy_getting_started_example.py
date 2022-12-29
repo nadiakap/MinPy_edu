@@ -63,21 +63,30 @@ class NM_Minimization(minpy.Minimization):
             count = count + 1
             f_m_current = self.get_f(self.m)
         return self.get_best()
-    
-X0 = np.array([0.8,1.9])
 
-onSphere = NM_Minimization(spher,X0)
 
-res = onSphere.NM_stochastic()
+def main():
+    """
+    This is where the main code runs.
+    """
+    X0 = np.array([0.8,1.9])
 
-print('sphere optimal function value:', round(res[0],3), ' at X:', round(res[1][0],3)   ,round(res[1][1],3)) 
-print('***********')
+    onSphere = NM_Minimization(spher,X0)
 
-X0 = np.array([0.8,1.9,-0.5,1.2,2.1])
+    res = onSphere.NM_stochastic()
 
-onHimmelblau = NM_Minimization(himmelblau,X0)
+    print('sphere optimal function value:', round(res[0],3), ' at X:', round(res[1][0],3)   ,round(res[1][1],3)) 
+    print('***********')
 
-res = onHimmelblau.NM_stochastic()
-print('himmelblau optimal function value:', round(res[0],3), ' at X:', round(res[1][0],3)   ,round(res[1][1],3),
-     round(res[1][1],3), round(res[1][2],3), round(res[1][3],3), round(res[1][4],3)) 
-print('***********') 
+    X0 = np.array([0.8,1.9,-0.5,1.2,2.1])
+
+    onHimmelblau = NM_Minimization(himmelblau,X0)
+
+    res = onHimmelblau.NM_stochastic()
+    print('himmelblau optimal function value:', round(res[0],3), ' at X:', round(res[1][0],3)   ,round(res[1][1],3),
+        round(res[1][1],3), round(res[1][2],3), round(res[1][3],3), round(res[1][4],3)) 
+    print('***********') 
+
+
+if __name__=='__main__':
+    main()
