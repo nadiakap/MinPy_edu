@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class DataContainer:
+class MinpyData:
     dist: str = 'uniform'
     K: int = 30
     X0: np.array = []
@@ -33,7 +33,7 @@ class Minimization(object):
     
     def __init__(self, f: callable, line_search_type=None):
         self.f = f
-        self.data = DataContainer()
+        self.data = MinpyData()
 
     def initialize(self):
         np.random.seed(5)
@@ -119,7 +119,7 @@ class Minimization(object):
         return tr
         
     def stop(self):
-        return (sum((self.fu-self.c)**2  ))**0.5 < self.tol
+        return (sum((self.data.fu-self.data.c)**2  ))**0.5 < self.data.tol
     
     def adjust_step(self):
         pass
