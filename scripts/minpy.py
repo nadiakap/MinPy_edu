@@ -6,6 +6,24 @@ class Trial(object):
         self.u = u
         self.fu = fu
         self.m = m
+
+class DataContainer:
+    def __init__(self):
+        self.dist: str = 'uniform'
+        self.K: int = 30
+        self.X0: np.array = []
+        self.m = self.X0
+        self.c: float = 0.0
+        self.step_size: float = 0.5
+        self.dim: int = X0.shape[0]
+        self.tol: float = 0.0001
+        self.fu: np.array = np.zeros(self.K)
+        self.maxIter: int = 600
+        if self.K <= self.dim:
+            self.K = self.dim + 1    
+        self.lb: np.array = []
+        self.ub: np.array = []
+        self.u = [self.X0]
     
 class Minimization(object):
     
