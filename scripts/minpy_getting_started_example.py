@@ -5,6 +5,9 @@ import numpy
 from optfun import spher,himmelblau
 from scipy.optimize import golden
 
+class DataContainer:
+    def __init__(self):
+        self.serialized_data_value: np.array = []
 
 class NM_Minimization(minpy.Minimization):
     """
@@ -13,6 +16,8 @@ class NM_Minimization(minpy.Minimization):
     @staticmethod
     def f_mean(f: callable, u0: np.array, fu0: np.array, m0: np.array, c0: np.array, K0: int, dim0: int, step0: float) -> float:
         # comment on details
+        container = DataContainer()
+        container.serialized_data_value 
         s: float = 0.0
         for i in range(K0):
              elem =  (fu0[i]-c0)*(m0 - u0[i])/(np.linalg.norm(m0-u0[i])**dim0)
