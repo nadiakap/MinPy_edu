@@ -1,55 +1,44 @@
 import numpy as np
 import epydoc
+from dataclasses import dataclass
+
+
+@dataclass
+class DataContainer:
+    dist: str = 'uniform'
+    K: int = 30
+    X0: np.array = []
+    m: np.array = self.X0
+    c: float = 0.0
+    step_size: float = 0.5
+    dim: int = X0.shape[0]
+    tol: float = 0.0001
+    fu: np.array = np.zeros(self.K)
+    maxIter: int = 600
+    if self.K <= self.dim:
+        self.K = self.dim + 1    
+    lb: np.array = []
+    ub: np.array = []
+    u = [self.X0]
+
 
 class Trial(object):
     def __init__(self,u,fu,m):
         self.u = u
         self.fu = fu
         self.m = m
-
-class DataContainer:
-    def __init__(self):
-        self.dist: str = 'uniform'
-        self.K: int = 30
-        self.X0: np.array = []
-        self.m = self.X0
-        self.c: float = 0.0
-        self.step_size: float = 0.5
-        self.dim: int = X0.shape[0]
-        self.tol: float = 0.0001
-        self.fu: np.array = np.zeros(self.K)
-        self.maxIter: int = 600
-        if self.K <= self.dim:
-            self.K = self.dim + 1    
-        self.lb: np.array = []
-        self.ub: np.array = []
-        self.u = [self.X0]
     
+
 class Minimization(object):
     
-    def __init__(self, f, X0, dist='uniform',K=30, lb=[], ub=[],
-                  line_search_type=None, step_size=0.5, tol=0.0001, mxIter = 600):
+    def __init__(self, f: callable, line_search_type=None):
         self.f = f
-        self.dist = dist
-        self.K = K
-        self.m = X0
-        self.c = 0.0
-        self.step_size = step_size
-        self.dim = X0.shape[0]
-        self.tol = tol
-        self.fu = np.zeros(self.K)
-        self.maxIter = mxIter
-        if K <= self.dim:
-            self.K = self.dim + 1    
-        self.lb = lb
-        self.ub = ub
-        self.u = [X0]
-        
+        self.data = DataContainer()
 
     def initialize(self):
         np.random.seed(5)
-        if self.dist == "exponential":
-            self.u =  np.random.exponential(1.0,[self.K, self.dim])
+        if self.data.dist == "exponential":
+            self.data.u =  np.random.exponential(1.0,[self.K, self.dim])
         elif self.dist == "gaussian":
             self.u = np.random.normal(self.m, 1.0,[self.K,self.dim])
         else:
@@ -62,12 +51,7 @@ class Minimization(object):
             else:
                 for i in range(self.dim):
                     self.u[:,i]=self.m[i]-0.5+self.u[:,i]
-                
 
-                
-                
-                
-    
     def compute_fu(self):
         for j in range(self.u.shape[0]):   
            self.fu[j] = self.f(self.u[j])
