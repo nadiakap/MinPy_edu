@@ -1,8 +1,38 @@
 """
 Test Functions For Optimization
+https://www.sfu.ca/~ssurjano/optimization.html
 """
 import numpy as np
 
+
+def plot_point_on_fnc(fnc,coord):
+    from mpl_toolkits.mplot3d import Axes3D
+    from matplotlib import cm
+    from matplotlib.ticker import LinearLocator, FormatStrFormatter
+    import matplotlib.pyplot as plot
+    import numpy as np
+    #%matplotlib inline 
+    fig = plot.figure()
+    ax = fig.gca(projection='3d')
+    s = 0.05 # Try s=1, 0.25, 0.1, or 0.05
+    X = np.arange(-2, 2.+s, s) #Could use linspace instead if dividing
+    Y = np.arange(-2, 3.+s, s) #evenly instead of stepping... 
+    #Create the mesh grid(s) for all X/Y combos.
+    X, Y = np.meshgrid(X, Y)
+    #Z =  X**2 + Y**2
+    
+    xx = np.stack((X,Y))
+    Z =  fnc(xx)
+    surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm,
+     linewidth=0, antialiased=False) #Try coolwarm vs jet
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+    plot.title('function ' + fnc.__name__)
+    z_point = fnc(coord)
+    ax.scatter(coord[0], coord[1], z_point, s = 50, c = 'g')
+    plot.show()
+    
 #plotting a function of two variables, 3d picture
 def plot_fnc(fnc):
     from mpl_toolkits.mplot3d import Axes3D
@@ -229,10 +259,13 @@ if __name__== "__main__":
     plot_fnc_rng(ackley,bounds)
     plot_fnc_rng(ackley)
 
+    coord = [0.5, -0.75]
+    plot_point_on_fnc(ackley,coord)
+   
     bounds = [[-4.,4.],[-4.,5]]
     plot_fnc_rng(himmelblau,bounds)
-    
+    '''
     bounds = [[-20.,20.],[-20.,20]]
-    plot_fnc_rng(easom,bounds,s=2.)
-   
+    plot_fnc_rng(easom,bounds,s=5.)
+    '''
         
