@@ -8,18 +8,18 @@ class DataContainer:
     dist: str = 'uniform'
     K: int = 30
     X0: np.array = []
-    m: np.array = self.X0
+    m: np.array = X0
     c: float = 0.0
     step_size: float = 0.5
     dim: int = X0.shape[0]
     tol: float = 0.0001
-    fu: np.array = np.zeros(self.K)
+    fu: np.array = np.zeros(K)
     maxIter: int = 600
-    if self.K <= self.dim:
-        self.K = self.dim + 1    
+    if K <= dim:
+        K = dim + 1    
     lb: np.array = []
     ub: np.array = []
-    u = [self.X0]
+    u = [X0]
 
 
 class Trial(object):
@@ -38,63 +38,63 @@ class Minimization(object):
     def initialize(self):
         np.random.seed(5)
         if self.data.dist == "exponential":
-            self.data.u =  np.random.exponential(1.0,[self.K, self.dim])
+            self.data.u =  np.random.exponential(1.0,[self.data.K, self.data.dim])
         elif self.dist == "gaussian":
-            self.u = np.random.normal(self.m, 1.0,[self.K,self.dim])
+            self.data.u = np.random.normal(self.data.m, 1.0,[self.data.K,self.data.dim])
         else:
-            self.u = np.random.rand(self.K,self.dim) 
+            self.data.u = np.random.rand(self.data.K,self.data.dim) 
             
-            if len(self.lb)!=0 and len(self.ub)!=0:
-                for i in range(self.dim):
-                    self.u[:,i]=self.lb[i]+self.u[:,i]*(self.ub[i]-self.lb[i])
+            if len(self.data.lb)!=0 and len(self.data.ub)!=0:
+                for i in range(self.data.dim):
+                    self.data.u[:,i]=self.data.lb[i]+self.data.u[:,i]*(self.data.ub[i]-self.data.lb[i])
   
             else:
-                for i in range(self.dim):
-                    self.u[:,i]=self.m[i]-0.5+self.u[:,i]
+                for i in range(self.data.dim):
+                    self.data.u[:,i]=self.data.m[i]-0.5+self.data.u[:,i]
 
     def compute_fu(self):
-        for j in range(self.u.shape[0]):   
-           self.fu[j] = self.f(self.u[j])
+        for j in range(self.data.u.shape[0]):   
+           self.data.fu[j] = self.f(self.data.u[j])
         
     def get_best(self):
-        y=min(self.fu)
-        idx = np.argmin(self.fu)
-        x=self.u[idx]
+        y=min(self.data.fu)
+        idx = np.argmin(self.data.fu)
+        x=self.data.u[idx]
         return (y,x)
         
     def sort(self):
-        sorted_ind = np.argsort(self.fu)
-        self.fu = np.take(self.fu, sorted_ind, 0)
-        self.u = np.take(self.u,sorted_ind,0)
+        sorted_ind = np.argsort(self.data.fu)
+        self.data.fu = np.take(self.data.fu, sorted_ind, 0)
+        self.data.u = np.take(self.data.u,sorted_ind,0)
 
     
     def update_m(self):    
-        self.m = np.mean(self.u[: -1],axis=0)
+        self.data.m = np.mean(self.data.u[: -1],axis=0)
         
     def update_c(self):
-        self.c = np.mean(self.fu)
+        self.data.c = np.mean(self.data.fu)
     
     #sift out values lower than averge functino level
     def sift(self):
-        self.fu = self.fu[self.fu<self.c]
-        ind = np.argwhere(self.fu<self.c)
-        self.u=self.u[ind]
+        self.data.fu = self.data.fu[self.fu<self.c]
+        ind = np.argwhere(self.data.fu<self.data.c)
+        self.data.u=self.data.u[ind]
 
 
     def reflect(self,z,rho = 1.): 
-        return self.m + rho*(self.m-z)
+        return self.data.m + rho*(self.data.m-z)
     
     def contract(self,z,rho = 0.3): 
-        return self.m + rho*(z - self.m)
+        return self.data.m + rho*(z - self.data.m)
     
     def shrink(self,z,rho,psi): 
-        return (1-psi)*self.m + psi*z
+        return (1-psi)*self.data.m + psi*z
     
     def expand(self,z,rho = 2.): 
-        return self.m + rho*(z-self.m)
+        return self.data.m + rho*(z-self.data.m)
     
     def modify(self,z,s = 1.): 
-        return self.m  + s*(self.m-z)   
+        return self.data.m  + s*(self.data.m-z)   
     
     def compute_new_vertex(self,z,s): 
         fz = self.get_f(z)

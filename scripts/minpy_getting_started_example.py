@@ -1,4 +1,5 @@
-import minpy
+from minpy import Minimization
+from minpy import MinpyData
 import numpy as np
 import copy
 import numpy
@@ -6,7 +7,7 @@ from optfun import spher,himmelblau
 from scipy.optimize import golden
 
 
-class NM_Minimization(minpy.Minimization):
+class NM_Minimization(Minimization):
     """
     This is going to be the place where we describe the class.
     """
@@ -30,27 +31,27 @@ class NM_Minimization(minpy.Minimization):
         return golden(fma,brack=bracket)     
                   
     def adjust_step(self, f_m_ub: np.array) -> None:
-        self.step_size = get_step_size(self.f, f_m_ub, self.u,self.fu,self.m,self.c,self.K,self.dim)
+        self.data.step_size = get_step_size(self.f, f_m_ub, self.data.u,self.data.fu,self.data.m,self.data.c,self.data.K,self.data.dim)
                
     def estimate_mean(self) -> None:
         s: float = 0.0
-        for i in range(self.K):
-             elem =  (self.fu[i]-self.c)*(self.m - self.u[i])/(np.linalg.norm(self.m-self.u[i])**self.dim)
+        for i in range(self.data.K):
+             elem =  (self.data.fu[i]-self.data.c)*(self.data.m - self.data.u[i])/(np.linalg.norm(self.data.m-self.data.u[i])**self.data.dim)
              s = s + elem
         s=s*self.step_size/self.K
         self.m = self.m + s
          
     def estimate_simplex(self): 
-         u_s = copy.copy(self.u ) 
-         for i in range(self.K):
-             u_s[i] = self.m + self.step_size*(self.fu[i]-self.c)*(self.m - self.u[i])/(np.linalg.norm(self.m-self.u[i])**self.dim)
+         u_s = copy.copy(self.data.u ) 
+         for i in range(self.data.K):
+             u_s[i] = self.data.m + self.data.step_size*(self.data.fu[i]-self.data.c)*(self.data. - self.data.u[i])/(np.linalg.norm(self.data.m-self.data.u[i])**self.data.dim)
 
-         self.m = np.mean(u_s[: -1],axis=0)
+         self.data.m = np.mean(u_s[: -1],axis=0)
          
     def NM_stochastic(self):
         self.initialize()
         self.update_m()
-        f_m_current = self.get_f(self.m)
+        f_m_current = self.get_f(self.data.m)
         self.compute_fu()
         count = 0
         while not self.stop() and count<=self.maxIter:
@@ -58,10 +59,10 @@ class NM_Minimization(minpy.Minimization):
             self.estimate_simplex()
             self.update_m()
         
-            if self.get_f(self.m) >=f_m_current:
+            if self.get_f(self.data.m) >=f_m_current:
                 self.adjust_step(f_m_current)
             count = count + 1
-            f_m_current = self.get_f(self.m)
+            f_m_current = self.get_f(self.data.m)
         return self.get_best()
 
 
