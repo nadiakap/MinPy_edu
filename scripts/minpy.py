@@ -1,26 +1,5 @@
 import numpy as np
 import epydoc
-from dataclasses import dataclass
-
-
-@dataclass
-class MinpyData:
-    dist: str = 'uniform'
-    K: int = 30
-    X0: np.array = []
-    m: np.array = X0
-    c: float = 0.0
-    step_size: float = 0.5
-    dim: int = X0.shape[0]
-    tol: float = 0.0001
-    fu: np.array = np.zeros(K)
-    maxIter: int = 600
-    if K <= dim:
-        K = dim + 1    
-    lb: np.array = []
-    ub: np.array = []
-    u = [X0]
-
 
 class Trial(object):
     def __init__(self,u,fu,m):
@@ -30,71 +9,110 @@ class Trial(object):
     
 
 class Minimization(object):
+    """
+    This class contains building blocks for creating custom optimization algorithms
+    Custom algorithms are defined in classes derived from this class
     
-    def __init__(self, f: callable, line_search_type=None):
+    the following parametrs are needed to initialize the algorithms
+    
+    f: callable - objective function for minimization, required parameter
+    X0: np.array - initial guess for the minimum point (vector of dim elements), required parameter  
+    dist: str - distribution type, default is 'uniform' 
+    K: int -  number of random vectors, default is = 30
+    m: np.array - center of mass of randomly generated vectors X, defaults to X0  
+    c: float - mean level of objective function f, dedfaults to 0.0
+    step_size: float - size of the step in the direction being explored on the given iteration of the algorithm, defaults to 0.5
+    dim: int - dimensionality of the problem space (number of coordinates), defaults to X0.shape[0]
+    tol: float - tolerance for accepting solution, defaults to 0.0001 
+    u: np.array - array of K randomly generated vectors - a matrix of K rows and dim columns,initialized with [X0]
+    fu: np.array - function values for randomly generated vectors u, initialized with np.zeros(K) 
+    maxIter: int - maximum number of iterations of the algorithm, defaults to 600
+    if K <= dim:
+    K = dim + 1    
+    lb: np.array -lower bound for the arguments, initialized with []
+    ub: np.array -upper bound for the arguments, initialized with []
+    """
+    
+    def __init__(self, f, X0, dist = 'uniform', K = 30, step_size = 0.5,
+                 tol = 0.0001, maxIter = 600, line_search_type=None, lb = [], ub = []):
         self.f = f
-        self.data = MinpyData()
+        self.X0 = X0
+        self.dist = dist
+        self.K = K
+        self.m = X0 
+        self.c = 0.0
+        self.step_size = 0.5 
+        self.dim = X0.shape[0]
+        self.tol = tol
+        self.u = [X0] 
+        self.fu = np.zeros(K)
+        self.maxIter = maxIter
+        if self.K <= self.dim:
+            self.K = self.dim + 1    
+        self.lb = lb
+        self.ub = ub
+        
 
     def initialize(self):
         np.random.seed(5)
-        if self.data.dist == "exponential":
-            self.data.u =  np.random.exponential(1.0,[self.data.K, self.data.dim])
+        if self.dist == "exponential":
+            self.u =  np.random.exponential(1.0,[self.K, self.dim])
         elif self.dist == "gaussian":
-            self.data.u = np.random.normal(self.data.m, 1.0,[self.data.K,self.data.dim])
+            self.u = np.random.normal(self.m, 1.0,[self.K,self.dim])
         else:
-            self.data.u = np.random.rand(self.data.K,self.data.dim) 
+            self.u = np.random.rand(self.K,self.dim) 
             
-            if len(self.data.lb)!=0 and len(self.data.ub)!=0:
-                for i in range(self.data.dim):
-                    self.data.u[:,i]=self.data.lb[i]+self.data.u[:,i]*(self.data.ub[i]-self.data.lb[i])
+            if len(self.lb)!=0 and len(self.ub)!=0:
+                for i in range(self.dim):
+                    self.u[:,i]=self.lb[i]+self.u[:,i]*(self.ub[i]-self.lb[i])
   
             else:
-                for i in range(self.data.dim):
-                    self.data.u[:,i]=self.data.m[i]-0.5+self.data.u[:,i]
+                for i in range(self.dim):
+                    self.u[:,i]=self.m[i]-0.5+self.u[:,i]
 
     def compute_fu(self):
-        for j in range(self.data.u.shape[0]):   
-           self.data.fu[j] = self.f(self.data.u[j])
+        for j in range(self.u.shape[0]):   
+           self.fu[j] = self.f(self.u[j])
         
     def get_best(self):
-        y=min(self.data.fu)
-        idx = np.argmin(self.data.fu)
-        x=self.data.u[idx]
+        y=min(self.fu)
+        idx = np.argmin(self.fu)
+        x=self.u[idx]
         return (y,x)
         
     def sort(self):
-        sorted_ind = np.argsort(self.data.fu)
-        self.data.fu = np.take(self.data.fu, sorted_ind, 0)
-        self.data.u = np.take(self.data.u,sorted_ind,0)
+        sorted_ind = np.argsort(self.fu)
+        self.fu = np.take(self.fu, sorted_ind, 0)
+        self.u = np.take(self.u,sorted_ind,0)
 
     
     def update_m(self):    
-        self.data.m = np.mean(self.data.u[: -1],axis=0)
+        self.m = np.mean(self.u[: -1],axis=0)
         
     def update_c(self):
-        self.data.c = np.mean(self.data.fu)
+        self.c = np.mean(self.fu)
     
     #sift out values lower than averge functino level
     def sift(self):
-        self.data.fu = self.data.fu[self.fu<self.c]
-        ind = np.argwhere(self.data.fu<self.data.c)
-        self.data.u=self.data.u[ind]
+        self.fu = self.fu[self.fu<self.c]
+        ind = np.argwhere(self.fu<self.c)
+        self.u=self.u[ind]
 
 
     def reflect(self,z,rho = 1.): 
-        return self.data.m + rho*(self.data.m-z)
+        return self.m + rho*(self.m-z)
     
     def contract(self,z,rho = 0.3): 
-        return self.data.m + rho*(z - self.data.m)
+        return self.m + rho*(z - self.m)
     
     def shrink(self,z,rho,psi): 
-        return (1-psi)*self.data.m + psi*z
+        return (1-psi)*self.m + psi*z
     
     def expand(self,z,rho = 2.): 
-        return self.data.m + rho*(z-self.data.m)
+        return self.m + rho*(z-self.m)
     
     def modify(self,z,s = 1.): 
-        return self.data.m  + s*(self.data.m-z)   
+        return self.m  + s*(self.m-z)   
     
     def compute_new_vertex(self,z,s): 
         fz = self.get_f(z)
@@ -119,7 +137,7 @@ class Minimization(object):
         return tr
         
     def stop(self):
-        return (sum((self.data.fu-self.data.c)**2  ))**0.5 < self.data.tol
+        return (sum((self.fu-self.c)**2  ))**0.5 < self.tol
     
     def adjust_step(self):
         pass
@@ -341,7 +359,7 @@ if __name__ == "__main__":
     X13 = np.array([0.8,1.9])
     ac_lb=np.array([-5, -5])
     ac_ub=np.array([5, 5])
-    myclass = Minimization(of.ackley,X13, K=100, lb=ac_lb,ub=ac_ub, mxIter=700)
+    myclass = Minimization(of.ackley,X13, K=100, lb=ac_lb,ub=ac_ub, maxIter=700)
     res = myclass.minimize_PSO_rr() 
     print('sphere optimization by PSO algorithm:', res)
     print('***********************')

@@ -264,8 +264,9 @@ if __name__== "__main__":
    
     bounds = [[-4.,4.],[-4.,5]]
     plot_fnc_rng(himmelblau,bounds)
-    '''
+
+    #this takes a while to run
     bounds = [[-20.,20.],[-20.,20]]
     plot_fnc_rng(easom,bounds,s=5.)
-    '''
+
         
