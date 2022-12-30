@@ -4,32 +4,12 @@ import copy
 import numpy
 from optfun import spher, himmelblau
 
-#finds objective function value for at the center of mass of u0 vectors
-def f_mean(f, u0, fu0, m0, c0, K0, dim0, step0):
-        # comment on details
-        s = 0.0
-        for i in range(K0):
-             elem =  (fu0[i]-c0)*(m0 - u0[i])/(np.linalg.norm(m0-u0[i])**dim0)
-             s = s + elem
-        s=s*step0/K0
-       
-        m0 = m0 + s
-        return f(m0)
-
-#adjust step size
-def get_step_size(f, f_m_ub, u0, fu0, m0, c0, K0, dim0):
-        from scipy.optimize import golden
-        def fma(step):
-            return f_mean(f, u0, fu0, m0, c0, K0, dim0, step)-f_m_ub
-        bracket = (0.02,0.5)
-        return golden(fma,brack=bracket)     
-
 class NM_Minimization(minpy.Minimization):
     """
     This class defines custom-made minimization algorithm that uses building blocks from minpy library
     Parametrs to all methods in this class are explained in Minimization class
     """
-    '''
+    
     @staticmethod
     def f_mean(f, u0, fu0, m0, c0, K0, dim0, step0):
         # comment on details
@@ -46,15 +26,15 @@ class NM_Minimization(minpy.Minimization):
     def get_step_size(f, f_m_ub, u0, fu0, m0, c0, K0, dim0):
         from scipy.optimize import golden
         def fma(step):
-            return f_mean(f, u0, fu0, m0, c0, K0, dim0, step)-f_m_ub
+            return NM_Minimization.f_mean(f, u0, fu0, m0, c0, K0, dim0, step)-f_m_ub
         bracket = (0.02,0.5)
         return golden(fma,brack=bracket)     
-    '''              
+                 
     def adjust_step(self, f_m_ub):
-        self.step_size = get_step_size(self.f, f_m_ub, self.u,self.fu,self.m,self.c,self.K,self.dim)
+        self.step_size = NM_Minimization.get_step_size(self.f, f_m_ub, self.u,self.fu,self.m,self.c,self.K,self.dim)
                
     def estimate_mean(self):
-        s: float = 0.0
+        s = 0.0
         for i in range(self.K):
              elem =  (self.fu[i]-self.c)*(self.m - self.u[i])/(np.linalg.norm(self.m-self.u[i])**self.dim)
              s = s + elem
@@ -86,28 +66,29 @@ class NM_Minimization(minpy.Minimization):
         return self.get_best()
 
 
-def main():
-    """
-    This is where the main code runs.
-    """
-    X0 = np.array([0.8,1.9])
 
-    onSphere = NM_Minimization(spher,X0)
+"""
+This is where the main code runs.
+"""
+X0 = np.array([0.8,1.9])
 
-    res = onSphere.NM_stochastic()
+onSphere = NM_Minimization(spher,X0)
 
-    print('sphere optimal function value:', round(res[0],3), ' at X:', round(res[1][0],3)   ,round(res[1][1],3)) 
-    print('***********')
+res = onSphere.NM_stochastic()
 
-    X0 = np.array([0.8,1.9,-0.5,1.2,2.1])
+print('sphere optimal function value:', round(res[0],3), ' at X:', round(res[1][0],3)   ,round(res[1][1],3)) 
+print('***********')
 
-    onHimmelblau = NM_Minimization(himmelblau,X0)
+X0 = np.array([0.8,1.9,-0.5,1.2,2.1])
 
-    res = onHimmelblau.NM_stochastic()
-    print('himmelblau optimal function value:', round(res[0],3), ' at X:', round(res[1][0],3)   ,round(res[1][1],3),
-        round(res[1][1],3), round(res[1][2],3), round(res[1][3],3), round(res[1][4],3)) 
-    print('***********') 
+onHimmelblau = NM_Minimization(himmelblau,X0)
 
+res = onHimmelblau.NM_stochastic()
+print('himmelblau optimal function value:', round(res[0],3), ' at X:', round(res[1][0],3)   ,round(res[1][1],3),
+    round(res[1][1],3), round(res[1][2],3), round(res[1][3],3), round(res[1][4],3)) 
+print('***********') 
 
+'''
 if __name__=='__main__':
     main()
+'''
