@@ -1,5 +1,6 @@
 import numpy as np
 import epydoc
+import copy
 
 class Trial(object):
     def __init__(self,u,fu,m):
@@ -98,7 +99,12 @@ class Minimization(object):
         ind = np.argwhere(self.fu<self.c)
         self.u=self.u[ind]
 
-
+    def update_simplex(self): 
+         u_s = copy.copy(self.u ) 
+         for i in range(self.K):
+             u_s[i] = self.m + self.step_size*(self.fu[i]-self.c)*(self.m - self.u[i])/(np.linalg.norm(self.m-self.u[i])**self.dim)
+         self.m = np.mean(u_s[: -1],axis=0)
+ 
     def reflect(self,z,rho = 1.): 
         return self.m + rho*(self.m-z)
     

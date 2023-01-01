@@ -6,6 +6,9 @@ import numpy as np
 
 
 def plot_point_on_fnc(fnc,coord):
+    """
+    draw a dot at given coordinates
+    """
     from mpl_toolkits.mplot3d import Axes3D
     from matplotlib import cm
     from matplotlib.ticker import LinearLocator, FormatStrFormatter
@@ -30,7 +33,7 @@ def plot_point_on_fnc(fnc,coord):
     fig.colorbar(surf, shrink=0.5, aspect=5)
     plot.title('function ' + fnc.__name__)
     z_point = fnc(coord)
-    ax.scatter(coord[0], coord[1], z_point, s = 50, c = 'g')
+    ax.scatter(coord[0], coord[1], z_point+0.1, s = 500, c = 'g')
     plot.show()
     
 #plotting a function of two variables, 3d picture
@@ -259,14 +262,14 @@ if __name__== "__main__":
     plot_fnc_rng(ackley,bounds)
     plot_fnc_rng(ackley)
 
-    coord = [0.5, -0.75]
+    coord = [1.75, 1.75]
     plot_point_on_fnc(ackley,coord)
    
     bounds = [[-4.,4.],[-4.,5]]
     plot_fnc_rng(himmelblau,bounds)
-
+    '''
     #this takes a while to run
     bounds = [[-20.,20.],[-20.,20]]
     plot_fnc_rng(easom,bounds,s=5.)
-
+    '''
         
