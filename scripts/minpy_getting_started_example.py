@@ -4,6 +4,7 @@ import copy
 import numpy
 from optfun import spher, himmelblau
 from scipy.optimize import golden
+from scipy.optimize import newton
 
 
 class NM_Minimization(minpy.Minimization):
@@ -23,15 +24,21 @@ class NM_Minimization(minpy.Minimization):
        
         m0 = m0 + s
         return f(m0)
-
+    '''
     @staticmethod
     def get_step_size(f, f_m_ub, u0, fu0, m0, c0, K0, dim0):
 
         def fma(step):
             return NM_Minimization.f_mean(f, u0, fu0, m0, c0, K0, dim0, step)-f_m_ub
         bracket = (0.02,0.5)
-        return golden(fma,brack=bracket)     
-                 
+        return golden(fma,brack=bracket)  
+    '''
+    @staticmethod
+    def get_step_size(f, f_m_ub, u0, fu0, m0, c0, K0, dim0):
+
+        #root = newton(f, 0.5)
+        pass
+        
     def adjust_step(self, m_prev,f_m_prev):
         new_f_m = self.get_f(self.m)
         i = 0
