@@ -8,6 +8,8 @@ A.I. Kaplinskii and A.I. Propoi. Second-order refinement conditions in nonlocal 
 For application of the methods in machine learning see this paper:
 DOI: https://doi.org/10.17308/sait.2018.4/1261
 
+Latest idea for students projects - implementation of the method of sliding tolerance (Himmelblau) using  minpy library.
+
 This library is under construction! We plan to add more building blocks over time.
 
 Please check minpy_getting_started_example.py to see how to construct custom algorithms using minpy building blocks.
