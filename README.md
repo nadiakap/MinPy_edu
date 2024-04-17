@@ -18,6 +18,9 @@ Currently the minpy library consists of two python files, minpy.py ( building bl
 Supporting paper from scipy 2022 conference: https://doi.org/10.25080/majora-212e5952-019
 Supporting poster from Scipy 2022 conference can be found in references.
 
+Similar mathematical framework is used in consensus-based optimization:
+https://www.jmlr.org/papers/volume22/21-0259/21-0259.pdf
+
 Prerequisites:
 
 1. Python 3.6+
