@@ -21,6 +21,9 @@ Supporting poster from Scipy 2022 conference can be found in references.
 Similar mathematical framework is used in consensus-based optimization:
 https://www.jmlr.org/papers/volume22/21-0259/21-0259.pdf
 
+More on mathematical tools for consensus-based optimization
+https://arxiv.org/abs/2312.10794
+
 Prerequisites:
 
 1. Python 3.6+
