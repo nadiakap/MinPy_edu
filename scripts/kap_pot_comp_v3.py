@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+sf# -*- coding: utf-8 -*-
 """
-comparing Stochastic Gradient Descent and its hybrid with Kapl style algorithm
-how these algorithms overcome catastrophic forgetting in data with changing regimes
+This is a framework for comparing SGD and Kaplinsky algorithms.
+in this version both algorithms are the same
 """
 
 import torch
@@ -106,3 +106,4 @@ plt.xticks(x, labels)
 plt.legend()
 plt.savefig("forgetting_comparison.png")
 plt.show()
+
