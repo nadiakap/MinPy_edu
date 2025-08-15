@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-compare gradient-based algorithm and Kaplinsky apprach on data with chenging remies
+forgetting effect in MLP (trained with default algorithm - Adam) 
+#when trained on financial data with changing regimes
 """
 
 import numpy as np
@@ -62,3 +63,4 @@ plt.ylabel("Accuracy")
 plt.title("Catastrophic Forgetting: Bull Market Task")
 plt.ylim(0, 1)
 plt.show()
+
