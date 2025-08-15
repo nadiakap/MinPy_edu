@@ -2,8 +2,12 @@
 
 \usepackage{amsmath} % \usepackage is a command that allows you to add functionality to your LaTeX code
 
-\title{Teaching ML in Professional Education Department} % Sets article title
-\author{Nadia Udler} % Sets authors name
+\title{Teaching ML in Professional Education} % Sets article title
+
+\author{
+ Phillip G. Bradford\thanks{ The University of Connecticut, Stamford, CT 06901, USA; phillip.bradford@uconn.edu} \and
+ Nadia Udler\thanks{ Connecticut State Colleges and Universities, Norwalk, CT, USA; nadia.udler@ncc.commnet.edu} 
+}
 \date{\today} % Sets date for date compiled
 
 % The preamble ends with the command \begin{document}
@@ -18,10 +22,13 @@
   
  Due to growing demand in fast ML education many professional education departments started to offer ML classes that do not require full time commitment from a student. However, they usually require decent Python coding skills. We are different in several aspects: we focus on concepts rather than skills and require only minimal coding background. We focus on concepts that underly ML methods rather than specific ML methods. We cater to a wider student audience.
   
- To address this challenge, we use the ideas borrowed from teaching of Operations Research (OR). After providing the students with a brief overview of ML approaches and tools, we offer them a menu of possible projects that can be tweaked to their specific goals and requirements. Among such projects are the ones based on diet, assignment, scheduling and logistic problems. Those classical problems from OR field can be tweaked to become machine learning models. Having selected the projects, the students continue to work on them for the rest of the course.
+ To address this challenge, we use the ideas borrowed from teaching of Operations Research (OR). After providing the students with a brief overview of ML approaches and tools, we offer them a menu of possible projects that can be tweaked to their specific goals and requirements. Among such projects are the ones based on diet, assignment, scheduling and logistic problems. Those classical problems from OR field can be tweaked to become machine learning models. 
+
+We use educational  library minpy \cite{NU} to demonstrate essential concepts from machine learning, such as online learning. 
+
   
- Our methodology may be useful for instructors of ML in professional education, as well as engineering undergraduate programs.
-    \section{Introduction} % creates a section
+ Our methodology may be useful for instructors of ML in professional education, as well as engineering undergraduate programs. This library 
+    \section{Introduction} % creates a section[
 
 The focus of the class is on basic machine learning (ML) ideas and concepts. 
 
@@ -31,7 +38,7 @@ Due to growing demand in fast ML education many professional education departmen
 
 This approach allows students to easily acquire the terminology and continue to study independently after finishing the class -  through books, videos  and software documentation.  The course is project-based. Each time the selection of the projects is different. It depends on the math knowledge of the students. First several projects are demonstrated to the whole class and utilize minimal mathematical background among participants. Students do not have to learn new math but see how their existing math knowledge can be used in ML.   Many students already have experience with some ML methods. Our class is helpful for understanding similarities between familiar methods.  The minimal mathematical background required for this class is: solving systems of linear equations and inequalities.
 
- Topics of machine learning are grouped by required mathematical background. Relationship with other disciplines is highlighted - statistics, probability, linear algebra, operations research, optimization, financial engineering. Students work in groups.  Members of the group may have different skills, and the reason is to have a variety of skills present in the group: computer programming, mathematics, mathematical modeling, subject matter expert knowledge. This allows to complete realistic projects. Educational software minpy is used for many projects.
+ Topics of machine learning are grouped by required mathematical background. Relationship with other disciplines is highlighted - statistics, probability, linear algebra, operations research, optimization, financial engineering. Students work in groups.  Members of the group may have different skills, and the reason is to have a variety of skills present in the group: computer programming, mathematics, mathematical modeling, subject matter expert knowledge. This allows to complete realistic projects. Educational software minpy \cite{MP} is used for many projects.
 
 
     \section{Projects} % creates a section
@@ -68,7 +75,7 @@ In self-paced projects students may utilize their subject matter expertise, adva
 
 Project example for a group with good programming skills and  college level mathematics would be Comparing Genetic Algorithm with Covariance Matrix Adaptation Evolution Strategy, based on minpy library modules.
 
-Project example for group with good programming skills, college-level mathematics and expertise in finance would be Portfolio selection using Black-Litterman approach. 
+Project example for group with good programming skills, college-level mathematics and expertise in finance would be Portfolio selection using Black-Litterman approach \cite{ZK}. 
 
 Project example for a group with good programming skills, college-level mathematics  and special interest in optimization may be Applying proximal operator as a step in generalized global optimization algorithm derived from potential theory. See Appendix for the description.
 
@@ -250,8 +257,30 @@ The complete example of solving diet problem can be found here \cite{diet}
 
 Required background: Python programming, college-level math
 
-Machine learning models are often provided as functions in software packages. Optimization of such functions is a challenging task because traditional derivative based optimization methods with guaranteed convergence properties cannot be used. In \cite{MP} we introduced educational software library minpy that allows to create new optimization methods with desired properties. Those methods include elementary modules designed using the approach for constructing global optimization algorithms based on potential theory \cite{KAP1,KAP2}. They do not use derivatives of objective function and as a result work with nondifferentiable functions (or functions given by computer programs, or black box functions), but have guaranteed convergence. The focus of the library is on the transparency of the generalized optimization method rather than on efficiency of implementation. This is important since this library is intended to be used for educational purposes. To further generalize the optimization algorithms, we suggest replacing certain steps of the algorithms with proximal operator applied to the current point of the search. This does not compromise the convergence of the algorithm  \cite{KAP3}  but allows to write the algorithm in more concise manner, making it more transparent. Suggested reading to learn more about proximal operators and proximal algorithms: \cite{LAKLG,RGMN,SGFLZ}
+Machine learning models are often provided as functions in software packages. Optimization of such functions is a challenging task because traditional derivative based optimization methods with guaranteed convergence properties cannot be used. In \cite{MP} we introduced educational software library minpy that allows to create new optimization methods with desired properties. Those methods include elementary modules designed using the approach for constructing global optimization algorithms based on potential theory \cite{KAP3,KAP2}. They do not use derivatives of objective function and as a result work with nondifferentiable functions (or functions given by computer programs, or black box functions), but have guaranteed convergence. The focus of the library is on the transparency of the generalized optimization method rather than on efficiency of implementation. This is important since this library is intended to be used for educational purposes. To further generalize the optimization algorithms, we suggest replacing certain steps of the algorithms with proximal operator applied to the current point of the search. This does not compromise the convergence of the algorithm  \cite{KAP3}  but allows to write the algorithm in more concise manner, making it more transparent. Suggested reading to learn more about proximal operators and proximal algorithms: \cite{LAKLG,RGMN,SGFLZ}
+ 
+\subsubsection{Fine Tuning  LLM for Specific Knowledge Area}
 
+
+Required background: Python programming, college-level math
+
+Large Language Models (LLM) are used in many applications in social and natural sciences, law, education, etc. LLMs require large amount of data for initial training, and then they can be fine-tuned on recent data, Such fine-tuning is perfomred using online or continual optimization algorithms. Such algorithms have a common problem - they are prone to catastrophic forgetting.  Optimization algorithm from our module minpy is designed based on Kaplinskiy's potential functions approach.
+
+These algorithms were inherently designed to operate in an online mode, where data arrives sequentially and parameter updates occur continuously. One significant advantage of this approach is its ability to mitigate the effects of catastrophic forgetting—a common issue in neural networks where previously learned information is lost when new data is introduced.
+
+
+Read more on this approach in a separate document.
+
+In this project students explore the behaviour of optimization algorithm from minpy library and its ability to overcome catastrophoc forgetting. 
+
+\subsubsection{Hallusinations in LLM}
+
+
+Required background: Python programming, college-level math
+
+Language Modeling has become a neccesary part of ML education.  This project explores NLP situations modeled as optimization problems. As LLMs are used for many applications, their shortcomings are explored and addressed.  Optimization plays important role in such tasks. For example, see  \cite{JDRJ} for dealing with LLMs hallucinations using discrete optimization algorithm. 
+
+In this project students are suggested to start with simple discrete optimization algorithm - branch-and-bound method, and then introduce additional parametrs, randomization, etc, to make it  more adaptable. bb method from minpy library may be used.
 
   \subsubsection{Introduction to neural network optimization}
 
@@ -265,6 +294,20 @@ As a real life application of ANN the problem of pricing new product in food ind
 
 Prerequisite for this project: familiarity with diet optimization problem
 
+
+ \subsubsection{Restricted Boltzmann Machine (RBM)}
+
+
+RBM can be thought of as maximum likelihood estimation of parameters of certain probability  function.. This probability function is represented by feed forward neural network with one hidden layer and one input (visible) layer,  and neurons from each layer are connected to all neurons in other layer but not connected to each other. Learning is performed using   special fast algorithm -  Contrastive Divergence  \cite{HNT},  \cite{ST}.  Furthre improvent in learning efficiency is suggested in this paper \cite{MR} and in this dissertation \cite{HHH}. RBMs  are often used in methods for discovering patterns in data, such feature extraction, and nonlinear dimentionality reduction \cite{BKMM} . For application in finance see this paper \cite{APC} and dissertations \cite{FH,HR}. 
+
+Prerequisite for this project: familiarity with Maximum Likelihood Estimation and  Expectation Maximization Algorithm,Feed-Forward Neural Networks.
+
+\subsubsection{Black Literman Model for portfolio selection and online learning}
+
+
+RBM can be thought of as maximum likelihood estimation of parameters of certain probability  function.. This probability function is represented by feed forward neural network with one hidden layer and one input (visible) layer,  and neurons from each layer are connected to all neurons in other layer but not connected to each other. Learning is performed using   special fast algorithm -  Contrastive Divergence  \cite{HNT},  \cite{ST}.  Furthre improvent in learning efficiency is suggested in this paper \cite{MR} and in this dissertation \cite{HHH}. RBMs  are often used in methods for discovering patterns in data, such feature extraction, and nonlinear dimentionality reduction \cite{BKMM} . For application in finance see this paper \cite{APC} and dissertations \cite{FH,HR}. 
+
+Prerequisite for this project: familiarity with Maximum Likelihood Estimation and  Expectation Maximization Algorithm,Feed-Forward Neural Networks.
 
  \begin{thebibliography}{9}
 \bibitem{RV}
@@ -288,10 +331,12 @@ Zan Chen, Wenlong Guo, Yuanjing Feng, Yongqiang Li, Changchen Zhao, Yi Ren, Ling
 \bibitem{LAKLG}
 Lingxiao Li, Noam Aigerman, Vladimir G. Kim, Jiajin Li, Kristjan Greenewald, Mikhail Yurochkin, Justin Solomon (2023) \emph{ Learning Proximal Operators to Discover  Multiple Optima}
 
-
 \bibitem{MP}
 Nadia Udler (2014) \emph{ Global optimization software library for research and education},Scipy Conference Proceedings
 
+\bibitem{JDRJ}
+ Erik Jones, Anca Dragan, Aditi Raghunathan, Jacob Steinhardt (2023) \emph{ Automatically Auditing Large Language Models via Discrete
+ Optimizationa}
 
 \bibitem{CS}
 Carolina Schwedhelm,  Khalid Iqba, Sven Knüppel,  Lukas Schwingshackl, Heiner Boeing (2018) \emph{ Contribution to the understanding of how PCA–derived dietary patterns emerge from habitual data on food consumption},Clinical Nutrition
@@ -311,6 +356,30 @@ Yufei Cui, Ziquan Liu, Wuguannan Yao, Qiao Li, Antoni B. Chan, Tei-wei Kuo, Chun
 
 \bibitem{KP1}
 Kaplinskij, A.I., Pesin, A.M (2018) \emph{ Fast converging optimization methods for multi layer perceptrons},Vestnik, the Journal of Voronezh University
+
+\bibitem{MR}
+Ferran Mazzanti and Enrique Romero (2020)  \emph{Efficient Evaluation of the Partition Function of  RBMs with Annealed Importance Sampling}
+
+\bibitem{HNT}
+Geoffrey Hinton (2010)  \emph{A Practical Guide to Training Restricted Boltzmann Machines}
+
+\bibitem{ST}
+Ilya Sutskever, Tijmen Tieleman (2010)  \emph{On the Convergence Properties of Contrastive Divergence}
+
+\bibitem{BKMM}
+ Guy Bresler, Frederic Koehler, Ankur Moitra, Elchanan Mossel (2018)  \emph{Learning Restricted Boltzmann Machines via Influence Maximization}
+
+\bibitem{APC}
+Carlos Assis, Adriano C. M. Pereira, Eduardo G. Carrano  (2018)  \emph{Restricted Boltzmann Machines for the Prediction of Trends in Financial Time Series}
+
+\bibitem{FH}
+Gustav Fredriksson, Anton Hellstrom (2019)  \emph{Restricted Boltzmann Machine as Recommendation Model for Venture Capital}
+
+\bibitem{HR}
+João Henrique, Fialho Rodrigues (2019) \emph{Time series analysis using restricted Boltzmann machines and dynamic Bayesian networks}
+
+\bibitem{HHH}
+Rares-Darius Buhai (2019) \emph{Learning Restricted Boltzmann Machines with Few Latent Variables}
 
 \bibitem{food}
 Food Dataset, \emph{ 'https://catalog.data.gov/dataset/supertracker-source-code-and-foods-database/resource/bb32cdd7-7c95-4a7a-99ff-4c5c578ad33c'}
@@ -339,6 +408,10 @@ Raffaele, A., Gobbi, A.(2021) \emph{Teaching Operations Research Before Universi
 
 \bibitem{sklearn1}
 Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V., Vanderplas, J., Passos, A., Cournapeau, D., Brucher, M., Perrot, M., Duchesnay, E.(2011) \emph{ Scikit-learn: Machine Learning in Python},Journal of Machine Learning Research
+
+\bibitem{ZK}
+Ziye Yang, Ke Lu (2025) \emph{Enhancing Black-Litterman Portfolio via Hybrid Forecasting Model Combining Multivariate Decomposition and Noise Reduction}
+
 
 \bibitem{anndemo}
 Pricing new foods  (2023)\emph{https://www.github.com/nadiakap/PythonForML}
