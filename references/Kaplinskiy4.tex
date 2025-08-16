@@ -313,6 +313,71 @@ Kaplinsky & Potential + conservation law & Energy conservation + Lyapunov & Prov
 \label{tab:comparison}
 \end{table}
 
+\section{Comparison of Kaplinsky, Polyak, Nesterov and Shor Methods}
+
+\subsection{Naum Shor's Subgradient Method}
+The subgradient method of Naum Shor is one of the fundamental algorithms for
+non-smooth convex optimization. Unlike gradient descent, which requires differentiability
+of the objective function, Shor's method can be applied to general convex
+functions, even when the gradient does not exist everywhere. 
+
+The update rule is
+\[
+    w_{t+1} = w_t - \alpha_t g_t,
+\]
+where $g_t \in \partial f(w_t)$ is a subgradient of $f$ at $w_t$ and $\alpha_t$
+is a step size. A classical choice of diminishing step size is
+\[
+    \alpha_t = \frac{a}{\sqrt{t+1}}, \quad a > 0.
+\]
+
+This ensures convergence in the convex setting, though at a slower $O(1/\sqrt{t})$
+rate compared to accelerated methods. The method emphasizes robustness and
+generality rather than speed. It does not, by itself, address catastrophic forgetting
+in sequential learning tasks, because it lacks a stabilizing term to preserve knowledge
+from past regimes. 
+
+\subsection{Unified Comparison}
+The four methods considered can be compared as follows:
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{3cm}|p{4cm}|p{4cm}|p{3cm}|}
+\hline
+\textbf{Method} & \textbf{Update Rule} & \textbf{Key Feature} & \textbf{Forgetting Behavior} \\
+\hline
+\textbf{Polyak (Heavy Ball)} & 
+$w_{t+1} = w_t - \eta \nabla f(w_t) + \beta (w_t - w_{t-1})$ &
+Momentum for faster convergence & Forgetting occurs due to drift toward new data \\
+\hline
+\textbf{Nesterov} &
+$v_{t+1} = \beta v_t - \eta \nabla f(w_t + \beta v_t), \; w_{t+1} = w_t + v_{t+1}$ &
+Look-ahead gradient, acceleration & Forgetting persists, though convergence is faster \\
+\hline
+\textbf{Shor (Subgradient)} &
+$w_{t+1} = w_t - \alpha_t g_t, \; \alpha_t = \tfrac{a}{\sqrt{t+1}}$ &
+Handles nonsmooth convex problems; guaranteed convergence in convex case & Forgetting not addressed, as no stability mechanism is present \\
+\hline
+\textbf{Kaplinsky (Lyapunov-based)} &
+$w_{t+1} = w_t - \eta \big(\nabla f(w_t) + \lambda (w_t - w^*)\big)$ &
+Lyapunov/potential stabilization, conservation-law inspired & Forgetting suppressed by stabilizing term \\
+\hline
+\end{tabular}
+\caption{Comparison of Kaplinsky, Polyak, Nesterov, and Shor optimization methods.}
+\end{table}
+
+\subsection{Discussion}
+Polyak and Nesterov introduced momentum to accelerate convergence on smooth objectives,
+but both are prone to forgetting when trained on sequentially changing regimes.
+Shor's method is more general and applies to nonsmooth problems, but its slow
+convergence and lack of stabilization prevent it from addressing catastrophic
+forgetting. In contrast, Kaplinsky's algorithm incorporates a Lyapunov-inspired
+conservation principle, which naturally stabilizes optimization trajectories,
+preserving knowledge from earlier tasks while still adapting to new data.
+
+
 
 \section{Conclusion}
 Although Kaplinskiy's algorithms were developed long before deep learning and reinforcement learning emerged, they share deep structural similarities with today's stochastic and adaptive optimization methods. His use of potential theory, Lyapunov functions, and online update mechanisms makes his work highly relevant to the theoretical foundations of modern machine learning.
@@ -344,6 +409,12 @@ Nadia Udler (2014) \emph{ Global optimization software library for research and 
 \bibitem{LDFT} Hongyu Li, Liang Ding, Meng Fang, Dacheng Tao  (2024)  \emph{ Revisiting Catastrophic Forgetting in Large Language Model Tuning}, Findings of the Association for Computational Linguistics
 \bibitem{ZMBVK} Rosie Zhao, Depen Morwani, David Brandfonbrener, Nikhil Vyas, Sham Kakade (2025) \emph{Deconstracting What Makes a Good Optimizer for Autoregressive Language Models}, International Conference on Learning Representations
 \bibitem{GSM} Chao Ma, Wenbo Gong, Meyer Scetbon, Edward Meeds (2025) \emph{SWAN: SGD with Normalization and Whitening Enables Stateless LLM Training}
+
+\bibitem{P}Polyak, B. T. (1964). Some methods of speeding up the convergence of iteration methods. USSR Computational Mathematics and Mathematical Physics, 4(5), 1–17.
+\bibitem{N}Nesterov, Y. (2004). Introductory Lectures on Convex Optimization: A Basic Course. Springer
+\bibitem{S}Shor, N. Z. (1985). Minimization Methods for Non-Differentiable Functions. Springer Series in Computational Mathematics.
+
+\bibitem{KAP7} Kaplinskij, A.I., Pesin, A.M., (2018) On the construction of fast-converging optimization methods for multilayer perceptrons (in Russian) ,RUDN Journal of Mathematics, Information Sciences and Physics
 
 \end{thebibliography}
 
