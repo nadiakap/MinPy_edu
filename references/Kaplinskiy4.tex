@@ -5,6 +5,7 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{enumitem}
+
 \title{Modern Interpretation of A.I. Kaplinskiy's Adaptive Optimization Algorithms}
 \author{}
 \date{}
@@ -248,6 +249,70 @@ In this section, we compare the sequential learning behavior of standard SGD
 and Kaplinsky's potential-based method on a synthetic dataset with two distinct tasks. 
 The dataset is presented sequentially: first Task A, then Task B, with no overlap in data. 
 We measure performance on both tasks after each training stage to quantify forgetting.
+\section{Comparison of Kaplinsky's Algorithm with Polyak and Nesterov Momentum}
+
+In this section we compare three accelerated optimization methods: 
+Polyak’s Heavy Ball method, Nesterov’s Accelerated Gradient, and Kaplinsky’s 
+potential-based algorithm. While the first two are based on physical 
+momentum analogies, Kaplinsky’s framework relies on conservation laws 
+and Lyapunov stability.
+
+\subsection{Polyak’s Heavy Ball Method}
+Polyak (1964) introduced the heavy ball method, which augments gradient descent with a momentum term:
+\[
+    w_{t+1} = w_t - \eta \nabla f(w_t) + \beta (w_t - w_{t-1}),
+\]
+where $\eta > 0$ is the learning rate and $\beta \in (0,1)$ is the momentum coefficient. 
+This method is inspired by the motion of a heavy ball rolling in a potential well, 
+where momentum smooths oscillations and accelerates convergence.
+
+\subsection{Nesterov’s Accelerated Gradient}
+Nesterov (1983) improved on Polyak’s approach by introducing a 
+``look-ahead'' correction. The update rule is
+\[
+    v_t = w_t + \beta (w_t - w_{t-1}), \qquad
+    w_{t+1} = v_t - \eta \nabla f(v_t).
+\]
+This method anticipates the next step before computing the gradient,
+achieving optimal convergence rates of order $O(1/k^2)$ for convex problems.
+
+\subsection{Kaplinsky’s Potential-Based Method}
+Kaplinsky (2018) introduced an alternative approach based on potential functions
+and conservation laws. A global potential $\Phi(w)$ is constructed so that 
+in the continuous-time dynamics
+\[
+    \frac{d}{dt} \Phi(w(t)) = 0,
+\]
+ensuring invariance of accumulated knowledge. In practice, controlled 
+dissipation is introduced:
+\[
+    \frac{d}{dt} \Phi(w(t)) \leq 0,
+\]
+which transforms the conserved quantity into a Lyapunov function. This guarantees 
+convergence while preserving essential components of $\Phi(w)$ corresponding to 
+previously learned tasks, thereby preventing catastrophic forgetting.
+
+\subsection{Comparison}
+Table~\ref{tab:comparison} summarizes the main differences between the three methods.
+
+\begin{table}[h!]
+\centering
+\scriptsize
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\textbf{Method} & \textbf{Principle} & \textbf{Analogy} & \textbf{Convergence} & \textbf{Forgetting Resistance} \\
+\hline
+Polyak (Heavy Ball) & Add raw momentum & Rolling ball & Faster than GD, but no strict guarantee & None \\
+\hline
+Nesterov & Momentum + look-ahead & Anticipated ball roll & Optimal for convex problems & None \\
+\hline
+Kaplinsky & Potential + conservation law & Energy conservation + Lyapunov & Proven (Lyapunov stability) & Yes \\
+\hline
+\end{tabular}
+\caption{Comparison of Polyak, Nesterov, and Kaplinsky optimization methods.}
+\label{tab:comparison}
+\end{table}
+
 
 \section{Conclusion}
 Although Kaplinskiy's algorithms were developed long before deep learning and reinforcement learning emerged, they share deep structural similarities with today's stochastic and adaptive optimization methods. His use of potential theory, Lyapunov functions, and online update mechanisms makes his work highly relevant to the theoretical foundations of modern machine learning.
