@@ -1,0 +1,245 @@
+\documentclass[12pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{bm}
+\usepackage{physics}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\title{\textbf{Documentation and Mathematical Foundations of the \texttt{minpy} Optimization Framework}}
+\author{Nadia Udler}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Overview}
+
+The \texttt{minpy} framework implements a family of nonlocal optimization algorithms based on \emph{potential theory}, following the ideas in Kaplinskii \& Propoi (``Nonlocal Optimization Methods Based on Potential Theory'').  It includes:
+
+\begin{itemize}
+    \item A \textbf{potential-based first-order method}, which constructs a potential field from sampled points and moves particles along the gradient of this potential.
+    \item A \textbf{second-order potential method}, which uses local curvature (Hessian) information to accelerate convergence.
+    \item Classical methods (particle swarm, Nelder–Mead, etc.) available in the same interface for comparison.
+\end{itemize}
+
+Each method can handle multimodal and nonconvex objectives by combining global exploration and local refinement.
+
+\section{Mathematical Foundation}
+
+\subsection{Potential Function Formulation}
+
+Given an objective function $f: \mathbb{R}^d \to \mathbb{R}$, we maintain a set of sample points (``particles'')
+\[
+U = \{ \mathbf{u}_1, \mathbf{u}_2, \ldots, \mathbf{u}_K \}, \qquad f_i = f(\mathbf{u}_i).
+\]
+From these samples, we construct a potential function
+\[
+\Phi(\mathbf{x}) = \sum_{j=1}^K w_j \, G\!\left(\|\mathbf{x} - \mathbf{u}_j\|; \varepsilon\right),
+\]
+where:
+\begin{itemize}
+    \item $G(r; \varepsilon)$ is a \emph{radial kernel} that smooths the field,
+    \item $w_j$ are weights determined by the quality of the sample,
+    \item $\varepsilon > 0$ controls the range of influence (annealed over iterations).
+\end{itemize}
+
+Typical choices for $G$ include:
+\begin{align}
+    G_\text{inv-power}(r) &= \frac{1}{(r^p + \varepsilon)}, \\
+    G_\text{inv-mq}(r) &= \frac{1}{\sqrt{r^2 + \varepsilon}}, \\
+    G_\text{gauss}(r) &= \exp\!\left(-\frac{r^2}{2\sigma^2}\right).
+\end{align}
+
+\subsection{Potential Gradient and Particle Movement}
+
+The ``force'' acting on a particle at $\mathbf{u}_i$ is given by the negative gradient of the potential:
+\[
+\mathbf{F}_i = -\nabla_{\mathbf{x}} \Phi(\mathbf{x}) \big|_{\mathbf{x} = \mathbf{u}_i}
+= - \sum_{j=1}^K w_j \, G'(r_{ij}) \, \frac{\mathbf{u}_i - \mathbf{u}_j}{r_{ij}},
+\]
+where $r_{ij} = \|\mathbf{u}_i - \mathbf{u}_j\|$ and $G'(r)$ is the radial derivative of the kernel.
+
+The particles move along this field:
+\[
+\mathbf{u}_i^{(t+1)} = \mathbf{u}_i^{(t)} + \eta_t \, \mathbf{F}_i^{(t)},
+\]
+where $\eta_t$ is a step size controlling the motion amplitude.
+
+\subsection{Weight Adaptation}
+
+Weights $w_j$ emphasize points with lower function values:
+\[
+w_j = \frac{\exp(-\beta_t (f_j - f_{\min}))}{\sum_{k=1}^K \exp(-\beta_t (f_k - f_{\min}))}.
+\]
+Here $\beta_t$ acts as an inverse temperature parameter that increases over iterations (annealing), focusing attraction toward promising regions.
+
+\subsection{Nonlocal--Local Transition}
+
+The potential parameter $\varepsilon_t$ is decreased according to an annealing schedule:
+\[
+\varepsilon_{t+1} = \rho_\varepsilon \, \varepsilon_t, \qquad 0 < \rho_\varepsilon < 1,
+\]
+which gradually sharpens the potential field from a smooth global surface to a fine local structure.
+
+\section{Algorithm 1: Potential-Based Nonlocal Minimization}
+
+\begin{algorithm}[h!]
+\caption{Nonlocal Potential Optimization (First-Order)}
+\begin{algorithmic}[1]
+\STATE Initialize $K$ particles $\mathbf{u}_i$ within bounds $[\mathbf{l}, \mathbf{u}]$.
+\STATE Evaluate $f_i = f(\mathbf{u}_i)$.
+\STATE Set $\varepsilon \leftarrow \varepsilon_0$, $\beta \leftarrow \beta_0$.
+\FOR{epoch $t = 1, \ldots, T$}
+    \STATE Compute weights $w_j$ from $f_j$.
+    \STATE For each particle $i$, compute force
+    \[
+        \mathbf{F}_i = -\sum_j w_j G'(r_{ij}) \frac{\mathbf{u}_i - \mathbf{u}_j}{r_{ij}}.
+    \]
+    \STATE Update positions $\mathbf{u}_i \leftarrow \mathbf{u}_i + \eta \, \mathbf{F}_i$.
+    \STATE Apply bounds and recompute $f_i$.
+    \STATE Anneal parameters:
+    $\varepsilon \leftarrow \rho_\varepsilon \varepsilon$, \quad $\beta \leftarrow \rho_\beta \beta$.
+\ENDFOR
+\STATE Return best particle $\mathbf{u}_\ast = \arg\min_i f_i$.
+\end{algorithmic}
+\end{algorithm}
+
+This algorithm is implemented in \texttt{minimize\_potential\_nonlocal()}.
+
+\section{Algorithm 2: Second-Order Potential Optimization}
+
+To accelerate convergence near minima, we augment the previous scheme with local second-order updates (Newton or Levenberg–Marquardt type).
+
+\subsection{Gradient and Hessian Approximation}
+
+For a point $\mathbf{x}$, we approximate:
+\[
+\nabla f(\mathbf{x})_i \approx \frac{f(\mathbf{x}+h\mathbf{e}_i) - f(\mathbf{x}-h\mathbf{e}_i)}{2h},
+\]
+and
+\[
+H_{ij}(\mathbf{x}) \approx \frac{f(\mathbf{x}+h(\mathbf{e}_i+\mathbf{e}_j)) - f(\mathbf{x}+h(\mathbf{e}_i-\mathbf{e}_j)) - f(\mathbf{x}-h(\mathbf{e}_i-\mathbf{e}_j)) + f(\mathbf{x}-h(\mathbf{e}_i+\mathbf{e}_j))}{4h^2}.
+\]
+
+\subsection{Damped Newton Step}
+
+The Newton update is computed as:
+\[
+\Delta \mathbf{x} = - (H + \lambda I)^{-1} \nabla f,
+\]
+where $\lambda > 0$ is a damping factor.  
+If the step fails to reduce $f$, $\lambda$ is increased; otherwise it is decreased.
+
+\begin{algorithm}[h!]
+\caption{Potential + Second-Order Refinement}
+\begin{algorithmic}[1]
+\STATE Run potential-based updates as in Algorithm 1.
+\STATE Select $N_\text{top}$ best particles for local refinement.
+\FOR{each selected particle $\mathbf{u}_i$}
+    \FOR{Newton iteration $k=1,\ldots,N_\text{newton}$}
+        \STATE Compute gradient $\mathbf{g}$ and Hessian $H$.
+        \STATE Solve $(H+\lambda I)\Delta \mathbf{x} = -\mathbf{g}$.
+        \STATE Line-search along $\Delta \mathbf{x}$ to ensure decrease in $f$.
+        \STATE If improvement $< \tau$, increase $\lambda$.
+    \ENDFOR
+\ENDFOR
+\STATE Return updated best particle.
+\end{algorithmic}
+\end{algorithm}
+
+This corresponds to \texttt{minimize\_potential\_second\_order()} in the Python code.
+
+\section{Connection to Classical Optimization Methods}
+
+\subsection{Relation to Momentum Methods}
+
+In first-order gradient methods with momentum:
+\[
+\mathbf{v}_{t+1} = \mu \mathbf{v}_t - \eta \nabla f(\mathbf{x}_t), \qquad
+\mathbf{x}_{t+1} = \mathbf{x}_t + \mathbf{v}_{t+1}.
+\]
+Kaplinskii’s potential methods can be viewed as a \emph{discretized, collective} momentum system, where multiple trajectories share information through a smoothed potential rather than direct gradient terms.
+
+\subsection{Relation to Particle Swarm Optimization}
+
+The potential force term $\mathbf{F}_i$ plays the same role as the attraction toward global and local best in PSO, but arises from a physically motivated potential rather than heuristic coefficients.
+
+\subsection{Relation to Newton and Quasi-Newton Methods}
+
+The second-order method approximates the local curvature of the objective directly, yielding steps similar to Newton or Levenberg–Marquardt updates:
+\[
+\mathbf{x}_{t+1} = \mathbf{x}_t - (H_t + \lambda I)^{-1} \nabla f_t.
+\]
+In practice, this allows quadratic convergence once the algorithm enters a local basin of attraction.
+
+\section{Implementation Structure in Python}
+
+\subsection{Class \texttt{Minimization}}
+\begin{itemize}
+    \item \textbf{Attributes:}
+        \begin{itemize}
+            \item \texttt{u} : array of shape $(K, d)$, particle coordinates.
+            \item \texttt{fu} : array of objective values.
+            \item \texttt{lb, ub} : lower and upper bounds.
+            \item \texttt{dim} : problem dimension.
+        \end{itemize}
+    \item \textbf{Methods:}
+        \begin{itemize}
+            \item \texttt{get\_f(x)}: evaluates the objective.
+            \item \texttt{sift()}: resamples poor particles.
+            \item \texttt{minimize\_potential\_nonlocal()}: first-order method.
+            \item \texttt{minimize\_potential\_second\_order()}: second-order refinement.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Usage Example}
+
+\begin{verbatim}
+def ackley(x):
+    x = np.asarray(x)
+    d = len(x)
+    term1 = -20 * np.exp(-0.2 * np.sqrt(np.sum(x**2)/d))
+    term2 = -np.exp(np.sum(np.cos(2*np.pi*x))/d)
+    return term1 + term2 + 20 + np.e
+
+m = Minimization(ackley, X0=np.zeros(2), K=60, lb=[-5,-5], ub=[5,5])
+fbest, xbest = m.minimize_potential_second_order(verbose=True)
+\end{verbatim}
+
+\section{Parameter Summary}
+
+\begin{center}
+\begin{tabular}{l l l}
+\hline
+Parameter & Description & Typical Range \\
+\hline
+$\varepsilon_0$ & Initial potential smoothing & $1 \text{--} 5$ \\
+$\varepsilon_\text{final}$ & Final smoothing scale & $10^{-4}$ \\
+$\beta_0$ & Initial inverse temperature & $0.5$ \\
+$\beta_\text{final}$ & Final inverse temperature & $20\text{--}50$ \\
+$\eta$ & Step size & $0.1\text{--}0.5$ \\
+$K$ & Number of particles & $30\text{--}200$ \\
+$\lambda$ & Damping for Newton step & $10^{-4}\text{--}10^{-2}$ \\
+\hline
+\end{tabular}
+\end{center}
+
+\section{Convergence Considerations}
+
+Under mild smoothness conditions, the potential-based method converges toward regions where $\nabla f \approx 0$, and the second-order refinement ensures rapid local convergence near stationary points.
+
+Potential-based algorithms exhibit good robustness in multimodal landscapes due to the nonlocal interactions among particles, which prevent premature convergence to poor minima.
+
+\section{References}
+
+\begin{enumerate}
+    \item Kaplinskii, I., \& Propoi, A. (1994). \emph{Nonlocal Optimization Methods Based on Potential Theory.}
+    \item Vidyasagar, M. (2005). \emph{Theory of Learning and Generalization: With Applications to Neural Networks and Control Systems.} Springer.
+    \item Nesterov, Y. (2004). \emph{Introductory Lectures on Convex Optimization: A Basic Course.} Kluwer.
+\end{enumerate}
+
+\end{document}
